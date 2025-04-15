@@ -1,242 +1,80 @@
-# Binance connector in Nodejs
+# Binance JavaScript Connectors
 
-[![npm version](https://badge.fury.io/js/%40binance%2Fconnector.svg)](https://badge.fury.io/js/%40binance%2Fconnector)
-[![Node version](https://img.shields.io/node/v/%40binance%2Fconnector.svg?style=flat)](http://nodejs.org/download/)
-[![Standard-Js](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/binance/binance-connector-js/ci.yaml)](https://github.com/binance/binance-connector-js/actions)
+[![Open Issues](https://img.shields.io/github/issues/binance/binance-connector-js)](https://github.com/binance/binance-connector-js/issues)
+[![Code Style: Prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4)](https://prettier.io/)
+![Node.js Version](https://img.shields.io/badge/Node.js-%3E=22.12.0-brightgreen)
+[![Known Vulnerabilities](https://snyk.io/test/github/binance/binance-connector-js/badge.svg)](https://snyk.io/test/github/binance/binance-connector-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+Collection of auto-generated TypeScript connectors for Binance APIs.
 
-This is a lightweight library that works as a connector to [Binance public API](https://github.com/binance/binance-spot-api-docs). It’s designed to be simple, clean, and easy to use with minimal dependencies.
+## Migration Guide
 
-- Supported APIs:
-    - `/api/*`
-    - `/sapi/*`
-    - Spot Websocket Market Stream
-    - Spot User Data Stream
-- Inclusion of test cases and examples
-- Customizable base URL, request timeout and HTTP proxy
-- Response metadata can be displayed
-- Customizable Logger
+If you're upgrading from the previous unified connector, refer to our [Migration Guide](./MIGRATION.md) for detailed steps on transitioning to the new modular structure. The legacy unified connectors (`@binance/connector` and `@binance/connector-typescript`) will still be available for a limited time. You can find the code for the unified connector in the `legacy` branch.
 
+## Prerequisites
 
-## Installation
+Before using the connectors, ensure you have:
+
+- **Node.js** (version 22.12.0 or later)
+- **npm** (comes with Node.js)
+- **nvm** (Node Version Manager)
+
+Using nvm:
 
 ```bash
-npm install @binance/connector
+nvm install 22.12.0
+nvm use 22.12.0
 ```
+
+## Available Connectors
+
+- [@binance/algo](./clients/algo/) - Algo Trading connector
+- [@binance/auto-invest](./clients/auto-invest/) - Auto Invest connector
+- [@binance/c2c](./clients/c2c/) - C2C connector
+- [@binance/convert](./clients/convert/) - Convert connector
+- [@binance/copy-trading](./clients/copy-trading/) - Copy Trading connector
+- [@binance/crypto-loan](./clients/crypto-loan/) - Crypto Loan connector
+- [@binance/derivatives-trading-coin-futures](./clients/derivatives-trading-coin-futures/) - Derivatives Trading (COIN-M Futures) connector
+- [@binance/derivatives-trading-options](./clients/derivatives-trading-options/) - Derivatives Trading (Options) connector
+- [@binance/derivatives-trading-portfolio-margin](./clients/derivatives-trading-portfolio-margin/) - Derivatives Trading (Portfolio Margin) connector
+- [@binance/derivatives-trading-portfolio-margin-pro](./clients/derivatives-trading-portfolio-margin-pro/) - Derivatives Trading (Portfolio Margin Pro) connector
+- [@binance/derivatives-trading-usds-futures](./clients/derivatives-trading-usds-futures/) - Derivatives Trading (USDS-M Futures) connector
+- [@binance/dual-investment](./clients/dual-investment/) - Dual Investment connector
+- [@binance/fiat](./clients/fiat/) - Fiat connector
+- [@binance/gift-card](./clients/gift-card/) - Gift Card connector
+- [@binance/margin-trading](./clients/margin-trading/) - Margin Trading connector
+- [@binance/mining](./clients/mining/) - Mining connector
+- [@binance/nft](./clients/nft/) - NFT connector
+- [@binance/pay](./clients/pay/) - Pay connector
+- [@binance/rebate](./clients/rebate/) - Rebate connector
+- [@binance/simple-earn](./clients/simple-earn/) - Simple Earn connector
+- [@binance/spot](./clients/spot/) - Spot Trading connector
+- [@binance/staking](./clients/staking/) - Staking connector
+- [@binance/sub-account](./clients/sub-account/) - Sub Account connector
+- [@binance/vip-loan](./clients/vip-loan/) - VIP Loan connector
+- [@binance/wallet](./clients/wallet/) - Wallet connector
 
 ## Documentation
 
-[https://binance.github.io/binance-connector-node/](https://binance.github.io/binance-connector-node/)
+For detailed information, refer to the [Binance API Documentation](https://developers.binance.com).
 
-## RESTful APIs
+## Installation
 
-```javascript
-const { Spot } = require('@binance/connector')
-
-const apiKey = ''
-const apiSecret = ''
-const client = new Spot(apiKey, apiSecret)
-
-// Get account information
-client.account().then(response => client.logger.log(response.data))
-
-// Place a new order
-client.newOrder('BNBUSDT', 'BUY', 'LIMIT', {
-  price: '350',
-  quantity: 1,
-  timeInForce: 'GTC'
-}).then(response => client.logger.log(response.data))
-  .catch(error => client.logger.error(error))
-
-```
-
-Please find `examples` folder to check for more endpoints.
-
-### Testnet
-
-While `/sapi/*` endpoints don't have testnet environment yet, `/api/*` endpoints can be tested in 
-[Spot Testnet](https://testnet.binance.vision/). You can use it by changing the base URL:
-
-```javascript
-// provide the testnet base url
-const client = new Spot(apiKey, apiSecret, { baseURL: 'https://testnet.binance.vision'})
-```
-
-### Base URL
-
-If `base_url` is not provided, it defaults to `api.binance.com`.
-
-It's recommended to pass in the `base_url` parameter, even in production as Binance provides alternative URLs in case of performance issues:
-
-- `https://api1.binance.com`
-- `https://api2.binance.com`
-- `https://api3.binance.com`
-
-### Optional Parameters
-
-Optional parameters are encapsulated to a single object as the last function parameter.
-
-```javascript
-const { Spot } = require('@binance/connector')
-
-const apiKey = ''
-const apiSecret = ''
-const client = new Spot(apiKey, apiSecret)
-
-client.account({ recvWindow: 2000 }).then(response => client.logger.log(response.data))
-
-```
-
-### Response Metadata
-
-The Binance API server provides weight usages in the headers of each response. This information can be fetched from `headers` property. `x-mbx-used-weight` and `x-mbx-used-weight-1m` show the total weight consumed within 1 minute.
-
-```
-// client initialization is skipped
-
-client.exchangeInfo().then(response => client.logger.log(response.headers['x-mbx-used-weight-1m']))
-
-```
-
-### Custom Logger Integration
-
-```javascript
-const Spot = require('@binance/connector')
-const fs = require('fs')
-const { Console } = require('console')
-
-// make sure the logs/ folder is created beforehand
-const output = fs.createWriteStream('./logs/stdout.log')
-const errorOutput = fs.createWriteStream('./logs/stderr.log')
-
-const logger = new Console({ stdout: output, stderr: errorOutput })
-const client = new Spot('', '', {logger: logger})
-
-client.exchangeInfo().then(response => client.logger.log(response.data))
-// check the output file
-
-```
-
-The default logger defined in the package is [Node.js Console class](https://nodejs.org/api/console.html). Its output is sent to `process.stdout` and `process.stderr`, same as the global console.
-
-### Error
-
-There are 2 types of error that may be returned from the API server and the user has to handle it properly:
-
-- `Client error`
-  - This is thrown when server returns `4XX`, it's an issue from client side.
-  - The following properties may be helpful to resolve the issue:
-    - Response header - Please refer to `Response Metadata` section for more details.
-    - HTTP status code
-    - Error code - Server's error code, e.g. `-1102`
-    - Error message - Server's error message, e.g. `Unknown order sent.`
-    - Request config - Configuration send to the server, which can include URL, request method and headers.
- 
-  ```
-  // client initialization is skipped
-  client.exchangeInfo({ symbol: 'invalidSymbol' })
-    .then(response => client.logger.log(response.data))
-    .catch(err => {
-      client.logger.error(err.response.headers) // full response header
-      client.logger.error(err.response.status) // HTTP status code 400
-      client.logger.error(err.response.data) // includes both error code and message
-      client.logger.error(err.response.config) // includes request's config 
-    })
-
-  ```
-        
-- `Server error`
-  - This is thrown when server returns `5XX`, it's an issue from server side.
-
-
-## Websocket
-
-```javascript
-const { Spot } = require('@binance/connector')
-
-const client = new Spot('', '', {
-  wsURL: 'wss://testnet.binance.vision' // If optional base URL is not provided, wsURL defaults to wss://stream.binance.com:9443
-})
-
-const callbacks = {
-  open: () => client.logger.log('open'),
-  close: () => client.logger.log('closed'),
-  message: data => client.logger.log(data)
-}
-const aggTrade = client.aggTradeWS('bnbusdt', callbacks)
-
-// unsubscribe the stream above
-setTimeout(() => client.unsubscribe(aggTrade), 3000)
-
-// support combined stream
-const combinedStreams = client.combinedStreams(['btcusdt@miniTicker', 'ethusdt@tikcer'], callbacks)
-```
-
-
-More websocket examples are available in the `examples` folder
-
-### Unsubscribe a Stream
-
-Unsubscription is achieved by closing the connection. If this method is called without any connection established, the console will output a message `No connection to close.`
-
-```
-// client initialization is skipped
-const wsRef = client.aggTradeWS('bnbusdt', callbacks)
-
-// The connection (bnbusdt@aggTrade) is closed after 3 secs.
-setTimeout(() => client.unsubscribe(wsRef), 3000)
-
-```
-
-### Auto Reconnect
-
-If there is a close event not initiated by the user, the reconnection mechanism will be triggered in 5 secs.
-
-### Custom Logger Integration
-
-```javascript
-const { Console } = require('console')
-const fs = require('fs')
-const Spot = require('@binance/connector')
-
-const output = fs.createWriteStream('./logs/stdout.log')
-const errorOutput = fs.createWriteStream('./logs/stderr.log')
-
-// make sure the logs/ folder is created beforehand
-const logger = new Console({ stdout: output, stderr: errorOutput })
-const client = new Spot('', '', {logger})
-
-const callbacks = {
-  open: () => client.logger.log('open'),
-  close: () => client.logger.log('closed'),
-  message: data => client.logger.log(data)
-}
-
-const wsRef = client.aggTradeWS('bnbusdt', callbacks)
-setTimeout(() => client.unsubscribe(wsRef), 5000)
-// check the output file
-
-```
-
-The default logger defined in the package is [Node.js Console class](https://nodejs.org/api/console.html). Its output is sent to `process.stdout` and `process.stderr`, same as the global console.
-
-Note that when the connection is initialized, the console outputs a list of callbacks in the form of `listen to event: <event_name>`.
-
-## Test
+Each connector is published as a separate npm package. For example:
 
 ```bash
-npm install
-
-npm run test
-
+npm install @binance/spot
 ```
 
-## Limitation
+## Contributing
 
-Futures and Vanilla Options APIs are not supported:
+Since this repository contains auto-generated code using OpenAPI Generator, we encourage you to:
 
-  - `/fapi/*`
-  - `/dapi/*`
-  - `/vapi/*`
-  -  Associated Websocket Market and User Data Streams
+1. Open a GitHub issue to discuss your ideas or report bugs
+2. Allow maintainers to implement necessary changes through the code generation process
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENCE) file for details.
